@@ -5,51 +5,46 @@ namespace Greed
     public class Dices
     {
         Random random = new Random();
-        int[] dice = new int[5];
+        int[] dice = new int[5]; //vytvoření prázdného pole velikosti 5
 
-        // Metoda pro generování náhodných hodů kostkami
         public void RandomDice()
         {
             for (int i = 0; i < dice.Length; i++)
             {
-                dice[i] = random.Next(1, 7); // Hod kostkou (1-6)
-                Console.Write(dice[i] + " "); // Výpis hodnot
+                dice[i] = random.Next(1, 7); // hod kostkou (1-6)
+                Console.Write(dice[i] + " ");
             }
-            Console.WriteLine(); // Pro nový řádek
         }
-
-        // Metoda pro výpočet skóre
         public int ScoreCount()
         {
-            int[] counts = new int[7]; // Počítadlo pro každé číslo kostky
+            int[] counts = new int[7];
             int score = 0;
 
-            // Procházení kostek a počítání výskytů jednotlivých čísel
-            for (int i = 0; i < dice.Length; i++)
+            for (int i = 0; i < dice.Length; i++) //počítání jednotlivých čísel
             {
                 counts[dice[i]]++;
             }
 
-            // Pravidlo pro jedničky
+
             if (counts[1] >= 3)
             {
-                score += 1000; // Trojice jedniček
+                score += 1000; // trojice jedniček = skore 1000
             }
-            score += (counts[1] % 3) * 100; // Zbývající jednotlivé jedničky
+            score += (counts[1] % 3) * 100; // za každou další 1 přidání 100 ke skóre
 
-            // Pravidlo pro pětky
-            if (counts[5] >= 3)
+
+            if (counts[5] >= 3) //trojice pětek = skore 500
             {
-                score += 500; // Trojice pětek
+                score += 500;
             }
-            score += (counts[5] % 3) * 50; // Zbývající jednotlivé pětky
+            score += (counts[5] % 3) * 50; // za každou další 5 přidání 50 ke skore
 
-            // Pravidlo pro ostatní čísla (2-6)
+
             for (int i = 2; i <= 6; i++)
             {
                 if (counts[i] >= 3)
                 {
-                    score += i * 100; // Trojice (2-6)
+                    score += i * 100; //další trojce od 2-6
                 }
             }
 
