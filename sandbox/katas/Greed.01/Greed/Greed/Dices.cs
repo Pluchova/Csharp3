@@ -4,23 +4,31 @@ namespace Greed
 {
     public class Dices
     {
+        const int NumberOfDice = 5;
+        const int NumberOfSideOnDice = 6;
         Random random = new Random();
-        int[] dice = new int[5]; //vytvoření prázdného pole velikosti 5
+        int[] dice = new int[NumberOfDice]; //vytvoření prázdného pole velikosti 5
 
         public void RandomDice()
         {
-            for (int i = 0; i < dice.Length; i++)
+            for (int i = 0; i < NumberOfDice; i++)
             {
-                dice[i] = random.Next(1, 7); // hod kostkou (1-6)
+                dice[i] = random.Next(1, NumberOfSideOnDice + 1); // hod kostkou (1-6)
                 Console.Write(dice[i] + " ");
             }
         }
+
         public int ScoreCount()
         {
-            int[] counts = new int[7];
+            return ScoreCount(dice);
+        }
+
+        public int ScoreCount(int[] dice )
+        {
+            int[] counts = new int[NumberOfSideOnDice + 1];
             int score = 0;
 
-            for (int i = 0; i < dice.Length; i++) //počítání jednotlivých čísel
+            for (int i = 0; i < NumberOfDice; i++) //počítání jednotlivých čísel
             {
                 counts[dice[i]]++;
             }
