@@ -5,7 +5,7 @@ var builder = WebApplication.CreateBuilder(args);
 }
 var app = builder.Build();
 {
-app.MapControllers();
+    app.MapControllers();
 }
 
 app.Run();

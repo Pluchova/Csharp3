@@ -12,9 +12,9 @@ namespace ToDoList.Domain.DTOs
         {
             var newToDoItem = new ToDoItem()
             {
-            Name = Name,
-            Description = Description,
-            IsCompleted = IsCompleted,
+                Name = Name,
+                Description = Description,
+                IsCompleted = IsCompleted,
             };
             return newToDoItem;
         }
