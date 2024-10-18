@@ -9,7 +9,7 @@ namespace ToDoList.WebApi.Controllers;
 [Route("api/[controller]")]
 public class ToDoItemsController : ControllerBase
 {
-    private static readonly List<ToDoItem> items = new();
+    public static readonly List<ToDoItem> items = new();
 
     [HttpPost]
     public IActionResult Create(ToDoItemCreateRequestDto request)
@@ -25,17 +25,21 @@ public class ToDoItemsController : ControllerBase
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError);
         }
 
-        return NoContent();
+        return CreatedAtAction(
+            nameof(ReadById),
+            new { toDoItemId = item.ToDoItemId },
+            ToDoItemGetResponseDto.FromDomain(item));
+
     }
 
     [HttpGet]
-    public IActionResult Read()
+    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
         try
         {
             if (!items.Any())
             {
-                return NotFound("Žádné úkoly nenalezeny.");
+                return NotFound();
             }
             var result = items.Select(ToDoItemGetResponseDto.FromDomain).ToList();
             return Ok(result);
@@ -54,7 +58,7 @@ public class ToDoItemsController : ControllerBase
             var item = items.Find(i => i.ToDoItemId == toDoItemId);
             if (item == null)
             {
-                return NotFound($"Úkol s ID {toDoItemId} nebyl nalezen.");
+                return NotFound();
             }
             return Ok(ToDoItemGetResponseDto.FromDomain(item));
         }
@@ -72,7 +76,7 @@ public class ToDoItemsController : ControllerBase
             var index = items.FindIndex(i => i.ToDoItemId == toDoItemId);
             if (index == -1)
             {
-              return NotFound($"Úkol s ID {toDoItemId} nebyl nalezen.");
+                return NotFound();
             }
             var updatedToDoItem = request.ToDomain(toDoItemId);
             items[index] = updatedToDoItem;
@@ -93,7 +97,7 @@ public class ToDoItemsController : ControllerBase
             var item = items.Find(i => i.ToDoItemId == toDoItemId);
             if (item == null)
             {
-                return NotFound($"Úkol s ID {toDoItemId} nebyl nalezen.");
+                return NotFound();
             }
             items.Remove(item);
             return NoContent();
