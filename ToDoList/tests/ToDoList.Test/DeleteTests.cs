@@ -16,7 +16,7 @@ namespace ToDoList.Test
         public void DeleteById_WhenItemExists_RemovesItemAndReturnsNoContent()
         {
             // Arrange
-             ToDoItemsController.items.Clear();
+            ToDoItemsController.items.Clear();
             var controller = new ToDoItemsController();
             var newToDoItem = new Domain.Models.ToDoItem()
             {
@@ -39,7 +39,7 @@ namespace ToDoList.Test
 
 
         [Fact]
-        public void  DeleteById_WhenItemNotExists_ReturnsNotFound()
+        public void DeleteById_WhenItemNotExists_ReturnsNotFound()
         {
             //Arrange
             ToDoItemsController.items.Clear();

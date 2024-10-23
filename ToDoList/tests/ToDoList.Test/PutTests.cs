@@ -44,16 +44,16 @@ namespace ToDoList.Test
             Assert.Equal("Updated Description", ToDoItemsController.items[0].Description);
         }
         [Fact]
-        public void  UpdateById_WhenItemNotExists_ReturnsNotFound()
+        public void UpdateById_WhenItemNotExists_ReturnsNotFound()
         {
             //Arrange
             ToDoItemsController.items.Clear();
             var controller = new ToDoItemsController();
-         var updatedToDoItem = new ToDoItemUpdateRequestDto(
-                Name: "Updated Name",
-                Description: "Updated Description",
-                IsCompleted: false
-            );
+            var updatedToDoItem = new ToDoItemUpdateRequestDto(
+                   Name: "Updated Name",
+                   Description: "Updated Description",
+                   IsCompleted: false
+               );
 
             //Act
             var result = controller.UpdateById(2, updatedToDoItem);
