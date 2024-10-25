@@ -37,13 +37,13 @@ public class ToDoItemsController : ControllerBase
     }
 
     [HttpGet]
-    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
+
     public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
         List<ToDoItem> itemsToGet;
         try
         {
-            itemsToGet = items;
+            itemsToGet = context.ToDoItems.ToList();
         }
         catch (Exception ex)
         {
@@ -63,7 +63,7 @@ public class ToDoItemsController : ControllerBase
         ToDoItem? itemToGet;
         try
         {
-            itemToGet = items.Find(i => i.ToDoItemId == toDoItemId);
+            itemToGet = context.ToDoItems.Find(toDoItemId);
         }
         catch (Exception ex)
         {
@@ -86,13 +86,18 @@ public class ToDoItemsController : ControllerBase
         try
         {
             //retrieve the item
-            var itemIndexToUpdate = items.FindIndex(i => i.ToDoItemId == toDoItemId);
-            if (itemIndexToUpdate == -1)
-            {
-                return NotFound(); //404
-            }
-            updatedItem.ToDoItemId = toDoItemId;
-            items[itemIndexToUpdate] = updatedItem;
+            var itemIndexToUpdate = context.ToDoItems.Find(toDoItemId);
+              if (updatedItem is null)
+        {
+            return NotFound(); //404
+        }
+
+        // Aktualizace hodnot (např. názvu, popisu atd.)
+        itemIndexToUpdate.Name = updatedItem.Name;
+        itemIndexToUpdate.Description = updatedItem.Description;
+        itemIndexToUpdate.IsCompleted = updatedItem.IsCompleted;
+
+        context.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -109,12 +114,13 @@ public class ToDoItemsController : ControllerBase
         //try to delete the item
         try
         {
-            var itemToDelete = items.Find(i => i.ToDoItemId == toDoItemId);
+            var itemToDelete = context.ToDoItems.Find(toDoItemId);
             if (itemToDelete is null)
             {
                 return NotFound(); //404
             }
-            items.Remove(itemToDelete);
+            context.ToDoItems.Remove(itemToDelete);
+            context.SaveChanges();
         }
         catch (Exception ex)
         {
