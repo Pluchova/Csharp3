@@ -38,6 +38,7 @@ public class ToDoItemsController : ControllerBase
 
     [HttpGet]
     public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
+    public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
         List<ToDoItem> itemsToGet;
         try
