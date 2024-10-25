@@ -1,41 +1,35 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+namespace ToDoList.Test;
+
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
-using ToDoList.Domain.Models;
+using ToDoList.Persistence;
 using ToDoList.WebApi.Controllers;
-using Xunit;
 
-namespace ToDoList.Test
+public class PostTests
 {
-    public class PostTests
+    [Fact]
+    public void Post_ValidRequest_ReturnsNewItem()
     {
-        [Fact]
-        public void Create_ReturnCreated()
-        {
-            // Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
-            var newToDoItem = new ToDoItemCreateRequestDto
-            (
-                Name: "jmeno",
-                Description: "popis",
-                IsCompleted: true
-            );
+        // Arrange
+        var context = new ToDoItemsContext("Data Source=../../../../../data/localdb.db");
+        var controller = new ToDoItemsController(context);
+        var request = new ToDoItemCreateRequestDto(
+            Name: "Jmeno",
+            Description: "Popis",
+            IsCompleted: false
+        );
 
-            //Act
-            var result = controller.Create(newToDoItem) as CreatedAtActionResult;
+        // Act
+        var result = controller.Create(request);
+        var resultResult = result.Result;
+        var value = result.GetValue();
 
-            //Assert
+        // Assert
+        Assert.IsType<CreatedAtActionResult>(resultResult);
+        Assert.NotNull(value);
 
-            Assert.NotNull(result);
-            Assert.Equal(StatusCodes.Status201Created, result.StatusCode);
-            var responseDto = Assert.IsType<ToDoItemGetResponseDto>(result.Value);
-            Assert.Equal("jmeno", responseDto.Name);
-            Assert.Equal(1, responseDto.Id);
-        }
+        Assert.Equal(request.Description, value.Description);
+        Assert.Equal(request.IsCompleted, value.IsCompleted);
+        Assert.Equal(request.Name, value.Name);
     }
 }

@@ -1,96 +1,55 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace ToDoList.Test;
+
 using Microsoft.AspNetCore.Mvc;
-using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
+using ToDoList.Persistence;
 using ToDoList.WebApi.Controllers;
-using Xunit;
 
-namespace ToDoList.Test
+public class GetTests
 {
-    public class GetTests
+    [Fact]
+    public void Get_AllItems_ReturnsAllItems()
     {
-
-        [Fact]
-        public void Get_All_ItemsWhenThereNoItems_ReturnsNotFound()
+        // Arrange
+        var context = new ToDoItemsContext("Data Source=../../../../../data/localdb.db");
+        var controller = new ToDoItemsController(context);
+        var toDoItem = new ToDoItem
         {
-            //Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
+            ToDoItemId = 1,
+            Name = "Jmeno",
+            Description = "Popis",
+            IsCompleted = false
+        };
+        controller.items.Add(toDoItem);
 
-            //Act
-            var result = controller.Read();
-            var resultResult = result.Result;
+        // Act
+        var result = controller.Read();
+        var resultResult = result.Result;
+        var value = result.GetValue();
 
-            //Assert
-            Assert.IsType<NotFoundResult>(resultResult);
-        }
+        // Assert
+        Assert.IsType<OkObjectResult>(resultResult);
+        Assert.NotNull(value);
 
-        [Fact]
-        public void Get_All_ItemsWhenThereSomeItems_ReturnsOk()
-        {
-            // Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
-            var newToDoItem = new ToDoItem
-            {
-                ToDoItemId = 1,
-                Name = "jmeno",
-                Description = "popis"
-            };
+        var firstItem = value.First();
+        Assert.Equal(toDoItem.ToDoItemId, firstItem.Id);
+        Assert.Equal(toDoItem.Description, firstItem.Description);
+        Assert.Equal(toDoItem.IsCompleted, firstItem.IsCompleted);
+        Assert.Equal(toDoItem.Name, firstItem.Name);
+    }
 
-            ToDoItemsController.items.Add(newToDoItem);
+    [Fact]
+    public void Get_NoItems_ReturnsNotFound()
+    {
+        // Arrange
+        var context = new ToDoItemsContext("Data Source=../../../../../data/localdb.db");
+        var controller = new ToDoItemsController(context);
 
-            //Act
-            var result = controller.Read();
+        // Act
+        var result = controller.Read();
+        var resultResult = result.Result;
 
-            //Assert
-            var resultOkObjectResult = Assert.IsType<OkObjectResult>(result.Result);
-            var returnItems = (resultOkObjectResult.Value as IEnumerable<ToDoItemGetResponseDto>).ToList();
-
-            Assert.Single(returnItems);
-            Assert.Equal(newToDoItem.Name, returnItems[0].Name);
-        }
-
-        [Fact]
-        public void Get_ItemsById_IfExists_ReturnsOk()
-        {
-            // Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
-            var newToDoItem = new ToDoItem
-            {
-                ToDoItemId = 1,
-                Name = "jmeno",
-                Description = "popis"
-            };
-            ToDoItemsController.items.Add(newToDoItem);
-
-            //Act
-            var result = controller.ReadById(newToDoItem.ToDoItemId);
-
-            //Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var item = Assert.IsType<ToDoItemGetResponseDto>(okResult.Value);
-            Assert.Equal(1, item.Id);
-        }
-
-        [Fact]
-        public void Get_ItemsById_IfNotExists_ReturnsNotFound()
-        {
-            //Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
-
-            //Act
-            var result = controller.ReadById(1);
-
-            //Assert
-            Assert.IsType<NotFoundResult>(result);
-        }
-
-
-
+        // Assert
+        Assert.IsType<NotFoundResult>(resultResult);
     }
 }

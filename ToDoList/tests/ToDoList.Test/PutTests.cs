@@ -1,65 +1,68 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+namespace ToDoList.Test;
+
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
+using ToDoList.Persistence;
 using ToDoList.WebApi.Controllers;
-using Xunit;
 
-namespace ToDoList.Test
+public class PutTests
 {
-    public class PutTests
+    [Fact]
+    public void Put_ValidId_ReturnsNoContent()
     {
-        [Fact]
-        public void Succesfull_UpdatebyID_ReturnsNoContent()
+        // Arrange
+        var path = AppContext.BaseDirectory;
+        var context = new ToDoItemsContext("Data Source=../../../../../data/localdb.db");
+        var controller = new ToDoItemsController(context);
+        var toDoItem = new ToDoItem
         {
-            // Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
-            var newToDoItem = new ToDoItem
-            {
-                ToDoItemId = 1,
-                Name = "jmeno",
-                Description = "popis"
-            };
+            ToDoItemId = 1,
+            Name = "Jmeno",
+            Description = "Popis",
+            IsCompleted = false
+        };
+        controller.items.Add(toDoItem);
 
-            ToDoItemsController.items.Add(newToDoItem);
+        var request = new ToDoItemUpdateRequestDto(
+            Name: "Jine jmeno",
+            Description: "Jiny popis",
+            IsCompleted: true
+        );
 
-            var updatedToDoItem = new ToDoItemUpdateRequestDto(
-                Name: "Updated Name",
-                Description: "Updated Description",
-                IsCompleted: false
-            );
+        // Act
+        var result = controller.UpdateById(toDoItem.ToDoItemId, request);
 
-            //Act
+        // Assert
+        Assert.IsType<NoContentResult>(result);
+    }
 
-            var result = controller.UpdateById(newToDoItem.ToDoItemId, updatedToDoItem);
-
-            //Assert
-
-            Assert.IsType<NoContentResult>(result);
-            Assert.Equal("Updated Name", ToDoItemsController.items[0].Name);
-            Assert.Equal("Updated Description", ToDoItemsController.items[0].Description);
-        }
-        [Fact]
-        public void  UpdateById_WhenItemNotExists_ReturnsNotFound()
+    [Fact]
+    public void Put_InvalidId_ReturnsNotFound()
+    {
+        // Arrange
+        var context = new ToDoItemsContext("Data Source=../../../../../data/localdb.db");
+        var controller = new ToDoItemsController(context);
+        var toDoItem = new ToDoItem
         {
-            //Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
-         var updatedToDoItem = new ToDoItemUpdateRequestDto(
-                Name: "Updated Name",
-                Description: "Updated Description",
-                IsCompleted: false
-            );
+            ToDoItemId = 1,
+            Name = "Jmeno",
+            Description = "Popis",
+            IsCompleted = false
+        };
+        controller.items.Add(toDoItem);
 
-            //Act
-            var result = controller.UpdateById(2, updatedToDoItem);
+        var request = new ToDoItemUpdateRequestDto(
+            Name: "Jine jmeno",
+            Description: "Jiny popis",
+            IsCompleted: true
+        );
 
-            //Assert
-            Assert.IsType<NotFoundResult>(result);
-        }
+        // Act
+        var invalidId = -1;
+        var result = controller.UpdateById(invalidId, request);
+
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
     }
 }

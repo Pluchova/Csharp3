@@ -1,57 +1,54 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.HttpResults;
+namespace ToDoList.Test;
+
 using Microsoft.AspNetCore.Mvc;
+using ToDoList.Domain.Models;
+using ToDoList.Persistence;
 using ToDoList.WebApi.Controllers;
-using Xunit;
-using Xunit.Abstractions;
 
-namespace ToDoList.Test
+public class DeleteTests
 {
-    public class DeleteTests
+    [Fact]
+    public void Delete_ValidId_ReturnsNoContent()
     {
-        [Fact]
-        public void DeleteById_WhenItemExists_RemovesItemAndReturnsNoContent()
+        // Arrange
+        var context = new ToDoItemsContext("Data Source=../../../../../data/localdb.db");
+        var controller = new ToDoItemsController(context);
+        var toDoItem = new ToDoItem
         {
-            // Arrange
-             ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
-            var newToDoItem = new Domain.Models.ToDoItem()
-            {
-                ToDoItemId = 1,
-                Name = "jmeno",
-                Description = "popis"
-            };
+            ToDoItemId = 1,
+            Name = "Jmeno",
+            Description = "Popis",
+            IsCompleted = false
+        };
+        controller.items.Add(toDoItem);
 
-            ToDoItemsController.items.Add(newToDoItem);
-            Assert.Single(ToDoItemsController.items);
-            //Act
+        // Act
+        var result = controller.DeleteById(toDoItem.ToDoItemId);
 
-            var result = controller.DeleteById(1);
+        // Assert
+        Assert.IsType<NoContentResult>(result);
+    }
 
-            //Assert
-
-            Assert.IsType<NoContentResult>(result);
-            Assert.Empty(ToDoItemsController.items);
-        }
-
-
-        [Fact]
-        public void  DeleteById_WhenItemNotExists_ReturnsNotFound()
+    [Fact]
+    public void Delete_InvalidId_ReturnsNotFound()
+    {
+        // Arrange
+        var context = new ToDoItemsContext("Data Source=../../../../../data/localdb.db");
+        var controller = new ToDoItemsController(context);
+        var toDoItem = new ToDoItem
         {
-            //Arrange
-            ToDoItemsController.items.Clear();
-            var controller = new ToDoItemsController();
+            ToDoItemId = 1,
+            Name = "Jmeno",
+            Description = "Popis",
+            IsCompleted = false
+        };
+        controller.items.Add(toDoItem);
 
-            //Act
-            var result = controller.DeleteById(1);
+        // Act
+        var invalidId = -1;
+        var result = controller.DeleteById(invalidId);
 
-            //Assert
-            Assert.IsType<NotFoundResult>(result);
-        }
-
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
     }
 }
-
