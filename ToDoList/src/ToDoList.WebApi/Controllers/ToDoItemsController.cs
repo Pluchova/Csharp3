@@ -3,15 +3,19 @@ using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
 using ToDoList.Domain.Models;
 using ToDoList.Persistence;
+using ToDoList.Persistence.Repositories;
 
 [ApiController]
 [Route("api/[controller]")]
 public class ToDoItemsController : ControllerBase
 {
     private readonly ToDoItemsContext context;
-    public ToDoItemsController(ToDoItemsContext context)
+    private readonly IRepository<ToDoItem> repository;
+
+    public ToDoItemsController(ToDoItemsContext context, IRepository<ToDoItem> repository) // Az domigrujeme, zbyde nam tu jen repository :)
     {
         this.context = context;
+        this.repository = repository;
     }
 
     [HttpPost]
@@ -20,8 +24,7 @@ public class ToDoItemsController : ControllerBase
         var item = request.ToDomain();
         try
         {
-            context.ToDoItems.Add(item);
-            context.SaveChanges();
+            repository.Create(item);
         }
         catch (Exception ex)
         {
@@ -80,23 +83,20 @@ public class ToDoItemsController : ControllerBase
     {
         //map to Domain object as soon as possible
         var updatedItem = request.ToDomain();
+        updatedItem.ToDoItemId = toDoItemId;
 
         //try to update the item by retrieving it with given id
         try
         {
             //retrieve the item
-            var itemIndexToUpdate = context.ToDoItems.Find(toDoItemId);
-              if (updatedItem is null)
-        {
-            return NotFound(); //404
-        }
+            var itemToUpdate = context.ToDoItems.Find(toDoItemId);
+            if (itemToUpdate is null)
+            {
+                return NotFound(); //404
+            }
 
-        // Aktualizace hodnot (např. názvu, popisu atd.)
-        itemIndexToUpdate.Name = updatedItem.Name;
-        itemIndexToUpdate.Description = updatedItem.Description;
-        itemIndexToUpdate.IsCompleted = updatedItem.IsCompleted;
-
-        context.SaveChanges();
+            context.Entry(itemToUpdate).CurrentValues.SetValues(updatedItem);
+            context.SaveChanges();
         }
         catch (Exception ex)
         {
@@ -118,6 +118,7 @@ public class ToDoItemsController : ControllerBase
             {
                 return NotFound(); //404
             }
+
             context.ToDoItems.Remove(itemToDelete);
             context.SaveChanges();
         }
