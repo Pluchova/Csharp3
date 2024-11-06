@@ -9,7 +9,7 @@ public class ToDoItemsController : ControllerBase
 {
     private readonly IRepository<ToDoItem> repository;
 
-     public ToDoItemsController(IRepository<ToDoItem> repository)
+    public ToDoItemsController(IRepository<ToDoItem> repository)
     {
         this.repository = repository;
     }
@@ -35,17 +35,18 @@ public class ToDoItemsController : ControllerBase
     [HttpGet]
     public ActionResult<IEnumerable<ToDoItemGetResponseDto>> Read()
     {
-        List<ToDoItem> itemsToGet;
+        IEnumerable<ToDoItem> itemsToGet;
         try
         {
-            itemsToGet = repository.Read().ToList();
+            itemsToGet = repository.ReadAll();
         }
         catch (Exception ex)
         {
             return Problem(ex.Message, null, StatusCodes.Status500InternalServerError); //500
         }
 
-        return (itemsToGet is null || itemsToGet.Count == 0)
+        //respond to client
+        return (itemsToGet is null || !itemsToGet.Any())
             ? NotFound() //404
             : Ok(itemsToGet.Select(ToDoItemGetResponseDto.FromDomain)); //200
     }
@@ -76,13 +77,14 @@ public class ToDoItemsController : ControllerBase
 
         try
         {
+            //retrieve the item
             var itemToUpdate = repository.ReadById(toDoItemId);
             if (itemToUpdate is null)
             {
                 return NotFound(); //404
             }
 
-            repository.UpdateById(toDoItemId, updatedItem);
+            repository.Update(updatedItem);
         }
         catch (Exception ex)
         {
