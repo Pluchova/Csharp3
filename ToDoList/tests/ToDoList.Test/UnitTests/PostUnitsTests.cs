@@ -3,7 +3,6 @@ namespace ToDoList.Test;
 using NSubstitute;
 using Microsoft.AspNetCore.Mvc;
 using ToDoList.Domain.DTOs;
-using ToDoList.WebApi.Controllers;
 using ToDoList.Persistence.Repositories;
 using ToDoList.Domain.Models;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 public class PostUnitTests
 {
     [Fact]
-    public void Post_ValidRequest_ReturnsNewItem()
+    public void Post_CreateRequest_ReturnsCreatedAtAction()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();
@@ -38,7 +37,7 @@ public class PostUnitTests
     }
 
     [Fact]
-    public void Post_UnhandledException_Returns500()
+    public void Post_CreateUnhandledException_ReturnsInternalServerError()
     {
         // Arrange
         var repositoryMock = Substitute.For<IRepository<ToDoItem>>();

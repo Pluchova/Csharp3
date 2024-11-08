@@ -1,7 +1,7 @@
-namespace ToDoList.Domain.DTOs;
 
+
+using global::ToDoList.Domain.Models;
 using ToDoList.Domain.Models;
-
 namespace ToDoList.Domain.DTOs
 {
     public record ToDoItemCreateRequestDto(string Name, string Description, bool IsCompleted)
