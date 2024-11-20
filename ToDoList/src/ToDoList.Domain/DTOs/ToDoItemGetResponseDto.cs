@@ -1,5 +1,7 @@
 namespace ToDoList.Domain.DTOs;
-using ToDoList.Domain.Models;
+
+using global::ToDoList.Domain.Models;
+
 
 public record class ToDoItemGetResponseDto(int Id, string Name, string Description, bool IsCompleted) //let client know the Id
 {
